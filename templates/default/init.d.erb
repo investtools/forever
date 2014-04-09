@@ -70,8 +70,9 @@ start() {
     mkdir -p $forever_dir
     chown $user:$group $forever_dir
    
-    # Launch the application
-    daemon --user=$user \
+    # Launch the application as root - no other use can run forever without a home directory
+    # until the updated version which observes FOREVER_ROOT is available through npm
+    daemon --user=root \
       FOREVER_ROOT=$forever_dir <%= @env_options %> $forever start --pidFile $pidfile -l $logfile -p $forever_dir -a -d -c $COMMAND --sourceDir $SOURCE_DIR $SOURCE_FILE $SCRIPT_OPTIONS
     RETVAL=$?
   else
