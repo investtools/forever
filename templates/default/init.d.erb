@@ -37,10 +37,12 @@ SOURCE_DIR=<%= @path %>
 SOURCE_FILE=<%= @script %>
 SCRIPT_OPTIONS=<%= @script_options %>
  
-user=<%= @user%>
+user=<%= @user %>
+group=<%= @group %>
 pidfile=/var/run/$NAME.pid
-logfile=/var/log/$NAME.log
-forever_dir=/var/run/forever
+log_dir=<%= @log_dir || '/var/log/node' %>
+logfile=$log_dir/$NAME.log
+forever_dir=/var/run/forever/$user
  
 node=node
 forever=forever
@@ -55,21 +57,29 @@ start() {
  
   if [ "$foreverid" == "" ]; then
     # Create the log and pid files, making sure that 
-    # the target use has access to them
-    touch $logfile
-    chown $user $logfile
- 
+    # the target user has access to them
+    mkdir -p $log_dir
+    if [ ! -f $logfile ] ; then
+      touch $logfile
+    fi
+    chown $user:$group $logfile
+
     touch $pidfile
-    chown $user $pidfile
- 
+    chown $user:$group $pidfile
+    
+    mkdir -p $forever_dir
+    chown $user:$group $forever_dir
+   
     # Launch the application
-    daemon --user=root \
-      <%= @env_options %> $forever start --pidFile $pidfile -l $logfile -p $forever_dir -a -d -c $COMMAND --sourceDir $SOURCE_DIR $SOURCE_FILE $SCRIPT_OPTIONS
+    daemon --user=$user \
+      FOREVER_ROOT=$forever_dir <%= @env_options %> $forever start --pidFile $pidfile -l $logfile -p $forever_dir -a -d -c $COMMAND --sourceDir $SOURCE_DIR $SOURCE_FILE $SCRIPT_OPTIONS
     RETVAL=$?
   else
     echo "Instance already running"
     RETVAL=0
   fi
+  echo
+  return $RETVAL
 }
  
 stop() {
@@ -79,6 +89,7 @@ stop() {
   else
     echo "Instance is not running";
   fi
+  echo
   RETVAL=$?
 }
 
@@ -94,16 +105,17 @@ restart() {
 
 getForeverId() {
   $forever columns set pid &> /dev/null
-  $forever list -p $forever_dir | $awk "\$3 && \$3 == \"$pid\" { gsub(/[\[\]]/, \"\", \$2); print \$2; }";
+  $forever list -p $forever_dir | grep $pid | $awk "\$3 && \$3 == \"$pid\" { gsub(/[\[\]]/, \"\", \$2); print \$2; }";
 }
- 
+
 if [ -f $pidfile ]; then
   read pid < $pidfile
+  foreverid=$(getForeverId)
 else
   pid=""
+  foreverid=""
 fi
 
-foreverid=$(getForeverId)
 
 # Reset forever columns
 $forever clear columns &> /dev/null
