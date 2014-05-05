@@ -44,7 +44,7 @@ LOGFILE=/var/log/$NAME.log
 
 start() {
         echo "Starting $NAME"
-        /usr/local/bin/forever --pidFile $PIDFILE --sourceDir $APPLICATION_DIRECTORY \
+        /usr/bin/forever --pidFile $PIDFILE --sourceDir $APPLICATION_DIRECTORY \
                 -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 \
                 start $APPLICATION_START &
         RETVAL=$?
@@ -69,7 +69,7 @@ restart() {
 
 status() {
         echo "Status for $NAME:"
-        /usr/local/bin/forever list
+        /usr/bin/forever list
         RETVAL=$?
 }
 
