@@ -41,3 +41,6 @@ License: [MIT](https://github.com/trabian/chef-forever/blob/master/LICENSE)
 
 Author: [David Radcliffe](https://github.com/dwradcliffe)
 
+
+## CFRICKE - Modifications to support ubuntu
+
