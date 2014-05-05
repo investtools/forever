@@ -44,9 +44,9 @@ LOGFILE=<%= @path %>/$NAME.log
 
 start() {
         echo "Starting $NAME"
-        /usr/bin/forever --pidFile $PIDFILE --sourceDir $APPLICATION_DIRECTORY \
-                -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 \
-                start $APPLICATION_START &
+        rm -f $PIDFILE
+        rm -f $LOGFILE
+        su <%= @user %> -c "/usr/bin/forever --pidFile $PIDFILE --sourceDir $APPLICATION_DIRECTORY -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START"
         RETVAL=$?
 }
 
