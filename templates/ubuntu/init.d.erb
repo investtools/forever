@@ -53,6 +53,7 @@ start() {
 stop() {
         if [ -f $PIDFILE ]; then
                 echo "Shutting down $NAME"
+                forever stop $(forever list | grep `cat $PIDFILE` | awk '{ print $3 }')
                 rm -f $PIDFILE
                 RETVAL=$?
         else
