@@ -41,7 +41,7 @@ APPLICATION_DIRECTORY=<%= @path %>
 APPLICATION_START=<%= @script %>
 PIDFILE=<%= @path %>/$NAME.pid
 LOGFILE=<%= @path %>/$NAME.log
-EXTRA_PARAMS=<%= @extra_params %>
+EXTRA_PARAMS="<%= @extra_params %>"
 start() {
         echo "Starting $NAME"
         rm -f $PIDFILE
