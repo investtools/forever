@@ -27,7 +27,7 @@ define :forever_service do
   end
 
 execute 'start service' do
-  command '/etc/init.d/params[:name] start'
+  command '/etc/init.d/' + params[:name] + ' start'
   cwd '/etc/init.d'
 end
 
