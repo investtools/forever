@@ -46,14 +46,15 @@ start() {
         echo "Starting $NAME"
         rm -f $PIDFILE
         rm -f $LOGFILE
-        su <%= @user %> -c "/usr/bin/forever --pidFile $PIDFILE --sourceDir $APPLICATION_DIRECTORY -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS"
+        cd $APPLICATION_DIRECTORY
+        sudo su <%= @user %> -c "/usr/bin/forever --pidFile $PIDFILE  -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS"
         RETVAL=$?
 }
 
 stop() {
         if [ -f $PIDFILE ]; then
                 echo "Shutting down $NAME"
-                forever stop $(forever list | grep `cat $PIDFILE` | awk '{ print $3 }')
+                sudo su <%= @user %> -c "forever stop $(forever list | grep `cat $PIDFILE` | awk '{ print $3 }')"
                 rm -f $PIDFILE
                 RETVAL=$?
         else
