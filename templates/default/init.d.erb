@@ -53,7 +53,7 @@ start() {
 
 stop() {
         if [ -f $PIDFILE ]; then
-                PID=`sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE` | awk '{print $3}'`
+                PID=`sudo -H -u <%= @user %> forever list | grep \`cat $PIDFILE\` | awk '{print $3}'`
                 echo "Shutting down $NAME: "$PID
                 sudo -H -u <%= @user %> forever stop $PID
                 rm -f $PIDFILE
@@ -72,8 +72,10 @@ restart() {
 
 status() {
         if [ -f $PIDFILE ]; then
-                echo "Status for $NAME:"
-                echo sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE`
+                PID=`sudo -H -u <%= @user %> forever list | grep \`cat $PIDFILE\` | awk '{print $3}'`
+
+                echo "Status for $NAME: "$PID
+                echo sudo -H -u <%= @user %> forever list | grep $PID
                 RETVAL=$?
         else
                 echo "$NAME is not running."
