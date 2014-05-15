@@ -47,14 +47,15 @@ start() {
         rm -f $PIDFILE
         rm -f $LOGFILE
         cd $APPLICATION_DIRECTORY
-        sudo su <%= @user %> -c "/usr/bin/forever --pidFile $PIDFILE  -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS"
+        sudo -H -u <%= @user %> /usr/bin/forever --pidFile $PIDFILE  -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS
         RETVAL=$?
 }
 
 stop() {
         if [ -f $PIDFILE ]; then
-                echo "Shutting down $NAME"
-                sudo su <%= @user %> -c "forever stop $(forever list | grep `cat $PIDFILE` | awk '{ print $3 }')"
+                PID=`sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE` | awk '{print $3}'`
+                echo "Shutting down $NAME: "$PID
+                sudo -H -u <%= @user %> forever stop $PID
                 rm -f $PIDFILE
                 RETVAL=$?
         else
@@ -70,9 +71,14 @@ restart() {
 }
 
 status() {
-        echo "Status for $NAME:"
-        /usr/bin/forever list
-        RETVAL=$?
+        if [ -f $PIDFILE ]; then
+            echo "Status for $NAME:"
+            echo sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE`
+            RETVAL=$?
+        else
+                echo "$NAME is not running."
+                RETVAL=0
+        fi
 }
 
 case "$1" in
