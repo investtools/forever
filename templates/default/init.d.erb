@@ -47,7 +47,7 @@ start() {
         rm -f $PIDFILE
         rm -f $LOGFILE
         cd $APPLICATION_DIRECTORY
-        sudo -H -u <%= @user %> /usr/bin/forever --pidFile $PIDFILE  -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS
+        sudo -H -u <%= @user %> forever --pidFile $PIDFILE  -a -l $LOGFILE --minUptime 5000 --spinSleepTime 2000 start $APPLICATION_START $EXTRA_PARAMS
         RETVAL=$?
 }
 
@@ -72,9 +72,9 @@ restart() {
 
 status() {
         if [ -f $PIDFILE ]; then
-            echo "Status for $NAME:"
-            echo sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE`
-            RETVAL=$?
+                echo "Status for $NAME:"
+                echo sudo -H -u <%= @user %> forever list | grep `cat $PIDFILE`
+                RETVAL=$?
         else
                 echo "$NAME is not running."
                 RETVAL=0
